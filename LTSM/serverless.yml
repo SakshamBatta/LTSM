@@ -1,0 +1,49 @@
+service: ltsm
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  memorySize: 2048
+  stage: dev
+  profile: saksham
+  region: ap-south-1
+  timeout: 30
+  lambdaHashingVersion: 20201221
+  environment: ${self:custom.settings.${self:custom.stage}}
+
+functions:
+  function1:
+    handler: handler.api_handler
+    events:
+      - http: ANY /{proxy+}
+      - http: ANY /
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-offline
+
+useDotenv: true
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  settings:
+    dev:
+      STAGE: ${self:custom.stage}
+      dbName: ${env:MYSQL_DB}
+      MYSQL_HOST: ${env:MYSQL_HOST}
+      MYSQL_USER: ${env:MYSQL_USER}
+      MYSQL_PASSWORD: ${env:MYSQL_PASSWORD}
+      MYSQL_DB: ${env:MYSQL_DB}
+      ACCESS_KEY_ID: ${env:ACCESS_KEY_ID}
+      SECRET_ACCESS_KEY: ${env:SECRET_ACCESS_KEY}
+      firebase_projectId: ${env:firebase_projectId}
+      firebase_clientEmail: ${env:firebase_clientEmail}
+      REGION: ${env:REGION}
+      S3_BUCKET: ${env:S3_BUCKET}
+      env: "DEV"
+      email_service: ${env:email_service}
+      email_host: ${env:email_host}
+      email_port: ${env:email_port}
+      email_user: ${env:email_user}
+      email_pass: ${env:email_pass}
